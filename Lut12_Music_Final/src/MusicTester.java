@@ -19,7 +19,7 @@ public class MusicTester
 		System.out.println(b1.getTitle());
 		System.out.println(b1.getReleaseDate());
 		System.out.println(b1.getCoverImagePath());
-		System.out.println(b1.getRecordingCompany());*/
+		System.out.println(b1.getRecordingCompany());
 		
 		Song s2 = new Song("'0304f2e8-f12b-4938-9d87-3323c51ee105'");
 		s2.setTitle("The Combine");

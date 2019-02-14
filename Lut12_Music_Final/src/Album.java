@@ -46,6 +46,7 @@ public class Album {
 			e.printStackTrace();
 		}
 	}
+	//all setters for database updating
 	public String getTitle() {
 		return title;
 	}
@@ -110,7 +111,7 @@ public class Album {
 	public void addSong(String songID) {
 		db = new DbUtilities();
 		songID =  Song.getSongID();
-		String sql = "INSERT INTO song_artist (fk_song_id,fk_artist_id) VALUES  ('" + albumID+"', '"+ songID +"');";
+		String sql = "INSERT INTO song_album (fk_song_id,fk_album_id) VALUES  ('" + albumID+"', '"+ songID +"');";
 		System.out.println(sql);
 		db.executeQuery(sql);
 	}
@@ -134,7 +135,7 @@ public class Album {
 	{
 		this.albumID = albumID;
 		db = new DbUtilities();
-		String sql = "DELETE FROM album WHERE album_id= "+ this.albumID+";";//Deletes a song from the database using songID as the key
+		String sql = "DELETE FROM album WHERE album_id= "+ this.albumID+";";//Deletes an album from the database with AlbumID as key
 		System.out.println(sql);
 		db.executeQuery(sql);
 	

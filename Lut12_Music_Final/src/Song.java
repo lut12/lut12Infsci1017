@@ -45,7 +45,7 @@ public class Song {
 			e.printStackTrace();
 		}
 	}
-
+	//all setters for database updating
 	public void deleteArtist(String aristID) {
 		db = new DbUtilities();
 		String sql = "DELETE FROM song_artist WHERE fk_artist_id = "+ aristID+";";
@@ -62,14 +62,14 @@ public class Song {
 
 		this.songID = songID;
 		db = new DbUtilities();
-		String sql = "DELETE FROM song WHERE song_id = "+ this.songID+";";//Deletes a song from the database using songID as the key
+		String sql = "DELETE FROM song WHERE song_id = "+ this.songID+";";//takes songID and uses that to delete song from db
 		System.out.println(sql);
 		db.executeQuery(sql);
 	}
 	public void addArtist(String artistID) {
 		db = new DbUtilities();
 		artistID = Artist.getArtistID();
-		String sql = "INSERT INTO song_artist (fk_song_id,fk_artist_id) VALUES  ('" + songID+"', '"+artistID+"');";
+		String sql = "INSERT INTO song_artist (fk_song_id,fk_artist_id) VALUES  ('" + songID+"', '"+artistID+"');"; //adds relation in song_artist
 		System.out.println(sql);
 		db.executeQuery(sql);
 	}
