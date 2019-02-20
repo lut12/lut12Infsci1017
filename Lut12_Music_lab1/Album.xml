@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Album>
+	<albumID>1</albumID>
+	<title>Screen Memories</title>
+	<releaseDate>10/25/18</releaseDate>
+	<coverImagePath>user/Documents/albums/screenmemories.jpg</coverImagePath>
+	<recordingCompany>Domino</recordingCompany>
+	<numberOfTracks>08/05/2018</numberOfTracks>
+		<albumSongs>
+			<Album>
+				<songID>1</songID>
+				<title>The Combine</title>
+				<length>3:55</length>
+				<filePath>user/Documents/songs/thecombine.mp3</filePath>
+				<releaseDate>10/25/2018</releaseDate>
+				<recordDate>08/05/2018</recordDate>
+			</Album>
+		</albumSongs>
+</Album>

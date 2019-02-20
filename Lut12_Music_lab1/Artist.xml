@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Artist>
+	<artistID>1</artistID>
+	<firstName>John</firstName>
+	<lastName>Maus</lastName>
+	<bandName>John Maus</bandName>
+	<bio>Experimental Electronic Artist/Experimental Dark Pop Music Artist</bio>
+</Artist>

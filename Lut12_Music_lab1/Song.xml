@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<song>
+	<songID>1</songID>
+	<title>The Combine</title>
+	<length>3:55</length>
+	<filePath>user/Documents/songs/thecombine.mp3</filePath>
+	<releaseDate>10/25/2018</releaseDate>
+	<recordDate>08/05/2018</recordDate>
+		<songArtists>
+			<Artist>
+			<artistID>1</artistID>
+			<firstName>John</firstName>
+			<lastName>Maus</lastName>
+			<bandName>John Maus</bandName>
+			<bio>Experimental Electronic Artist/Experimental Dark Pop Music Artist</bio>
+			</Artist>
+		</songArtists>
+</song>
