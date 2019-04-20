@@ -4,6 +4,9 @@ import java.sql.SQLException;
 import java.util.UUID;
 import java.sql.*;
 import javax.persistence.*;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 @Entity
 @Table(name="artist")
 public class Artist {
@@ -121,6 +124,22 @@ public class Artist {
 	}
 	public String getFirstName() {
 		return firstName;
+	}
+	public JSONObject toJSON(){
+		JSONObject artistJson = new JSONObject();
+		try {
+			artistJson.put("artist_id", this.artistID);
+			artistJson.put("first_name", this.firstName);
+			artistJson.put("last_name", this.lastName);
+			artistJson.put("band_name", this.bandName);
+			artistJson.put("bio", this.bio);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return artistJson;
+		
 	}
 	
 }

@@ -1,103 +1,139 @@
+/**
+ * this class manages CRUD operations for the Artist class
+ * based on Dr. Babichenko's MusicJPA example code from the GenreManager class
+ * @author Luke Tuite
+ */
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import java.util.UUID;
+import org.json.JSONArray;
+
 
 public class ArtistManager {
-	public void createArtist(String firstName, String lastName, String bandName, String bio){
-		EntityManagerFactory emFactory = 
-				Persistence.createEntityManagerFactory("Lut12_Music2JPA");
+	
+	public JSONArray getArtistList(String searchTerm, String searchType){
+		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("Lut12_Music2JPA");
+		EntityManager em = emFactory.createEntityManager();
 		
+		// Note that you are querying the object grid, not the database!
+		String qry = "SELECT a.artistID FROM Artist a ";
+		
+		if(!searchTerm.equals("")){
+			if(searchType.equalsIgnoreCase("equals")){
+				qry += "WHERE a.bandName = '" + searchTerm + "'";
+			}
+			else if(searchType.equalsIgnoreCase("begin")){
+				qry += "WHERE a.bandName LIKE '" + searchTerm + "%'";
+			}
+			else if(searchType.equalsIgnoreCase("ends")){
+				qry += "WHERE a.bandName LIKE '%" + searchTerm + "'";
+			}
+			else{
+				qry += "WHERE a.bandName LIKE '%" + searchTerm + "%'";
+			}
+		}
+		
+		List<String> artistIDs = em.createQuery(qry).getResultList();
+		JSONArray artistListJSON = new JSONArray();
+		for(String artistID : artistIDs) {
+			Artist a = em.find(Artist.class, artistID);
+			artistListJSON.put(a.toJSON());
+		}
+		em.close();
+		emFactory.close();
+		
+		return artistListJSON;
+	}
+	/**
+	 * uses an EntityManager to create a new Artist record in the database
+	 * @param firstName
+	 * @param lastName
+	 * @param bandName
+	 * @param bio
+	 */
+	public void createArtist(String firstName, String lastName, String bandName, String bio) {
+		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("Lut12_Music2JPA");
 		EntityManager em = emFactory.createEntityManager();
 		
 		em.getTransaction().begin();
-		Artist g = new Artist();
+		Artist a = new Artist();
 		
-		// Artist a = new Artist();
-		g.setArtistID(UUID.randomUUID().toString());
+		a.setFirstName(firstName);
+		a.setLastName(lastName);
+		a.setBandName(bandName);
+		a.setBio(bio);
 		
-		//g.setArtistID(ArtistID);
-		g.setFirstName(firstName);
-		g.setLastName(lastName);
-		g.setBandName(bandName);
-		g.setBio(bio);
-		
-		
-		// Add the Artist object to the ORM object grid
-		em.persist(g);
-		
-		// Commit transaction
+		em.persist(a);
 		em.getTransaction().commit();
-		
-		// Close connection to persistence manager
 		em.close();
 		emFactory.close();
 	}
-	
-	
-	public void updateArtist(String ArtistID, String firstName, String lastName, String bandName, String bio){
+	/**
+	 * pulls an Artist object from the database based on its ID and then edits its attributes
+	 * @param artistID
+	 * @param firstName
+	 * @param lastName
+	 * @param bandName
+	 * @param bio
+	 */
+	public void updateArtist(String artistID, String firstName, String lastName, String bandName, String bio) {
 		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("Lut12_Music2JPA");
 		EntityManager em = emFactory.createEntityManager();
 		em.getTransaction().begin();
 		
-		Artist g = em.find(Artist.class, ArtistID);
+		Artist a = em.find(Artist.class, artistID);
 		
-		if(!firstName.equals("")){
-			g.setFirstName(firstName);
+		if (!firstName.equals("")) {
+			a.setFirstName(firstName);
 		}
 		
-		if(!lastName.equals("")){
-			g.setLastName(lastName);
+		if (!lastName.equals("")) {
+			a.setLastName(lastName);
 		}
 		
-		if(!bandName.equals("")) {
-			g.setBandName(bandName);
+		if (!bandName.equals("")) {
+			a.setBandName(bandName);
 		}
-		if(!bio.equals("")) {
-			g.setBio(bio);
-		}
-		em.persist(g);
-		em.getTransaction().commit();
 		
+		if (!bio.equals("")) {
+			a.setBio(bio);
+		}
+		
+		em.persist(a);
+		em.getTransaction().commit();		
 		em.close();
 		emFactory.close();
 	}
-	
-	public void deleteArtist(String ArtistID){
+	/**
+	 * deletes an Artist record with the given ID from the database
+	 * @param artistID
+	 */
+	public void deleteArtist(String artistID) {
 		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("Lut12_Music2JPA");
 		EntityManager em = emFactory.createEntityManager();
 		em.getTransaction().begin();
 		
-		Artist g = em.find(Artist.class, ArtistID);
-		
-		em.remove(g);
+		Artist a = em.find(Artist.class, artistID);
+		em.remove(a);
 		em.getTransaction().commit();
-		
 		em.close();
 		emFactory.close();
 	}
-	public Artist findArtist(String artistID)
-	{
+	/**
+	 * retrieves an Artist record with the given ID from the database
+	 * @param artistID
+	 * @return Artist object
+	 */
+	public Artist findArtist(String artistID) {
 		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("Lut12_Music2JPA");
 		EntityManager em = emFactory.createEntityManager();
 		em.getTransaction().begin();
 		
-		Artist g = em.find(Artist.class, artistID);
-		
-		System.out.println(g.getArtistID());
-		System.out.println(g.getFirstName());
-		System.out.println(g.getLastName());
-		System.out.println(g.getBandName());
-		System.out.println(g.getBio());
-		
-		
-		em.persist(g);
-		
+		Artist a = em.find(Artist.class, artistID);
 		em.getTransaction().commit();
-		
 		em.close();
 		emFactory.close();
-		
-		return g;
+		return a;
 	}
 }

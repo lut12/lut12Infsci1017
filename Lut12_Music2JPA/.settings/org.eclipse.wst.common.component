@@ -2,6 +2,12 @@
     <wb-module deploy-name="Lut12_Music">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <dependent-module archiveName="servlet-api.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/Users/Ltuit/OneDrive/Documents/apache-tomcat-9.0.17/lib/servlet-api.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="java-json.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/Users/Ltuit/OneDrive/Documents/javajars/java-json.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="context-root" value="Lut12_Music"/>
         <property name="java-output-path" value="/Lut12_Music/build/classes"/>
     </wb-module>

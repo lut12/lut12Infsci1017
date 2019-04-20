@@ -21,8 +21,8 @@ public class ConnectTest {
 			Statement statement = conn.createStatement();
             statement.executeUpdate(sql);
 			
-			Statement statement = conn.createStatement();
-			ResultSet rs = statement.executeQuery(sql); // Return ResultSet
+			Statement preparedStatement = conn.createStatement();
+			ResultSet rs = preparedStatement.executeQuery(sql); // Return ResultSet
             
 			while(rs.next()){
 				System.out.println(rs.getString(1));

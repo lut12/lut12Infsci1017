@@ -1,215 +1,175 @@
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Map;
-import java.util.UUID;
+/**
+ * this class deals with the album table in the music2019 database
+ * it includes a default constructor, getters, and setters
+ * @author Luke Tuite
+ */
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import java.sql.*;
-import java.util.*;
 import javax.persistence.*;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 
-	@Entity
-	@Table(name="album")
-	public class Album {
-		@Id
-		@GeneratedValue(strategy = GenerationType.AUTO)
-		
-		@Column(name = "album_id")
-		private String albumID;
-		
-		@Column(name = "title")
-		private String title;
-		
-		@Column(name = "release_date")
-		private String releaseDate;
-		
-		@Column(name = "recording_company_name")
-		private String recordingCompany;
-		
-		@Column(name = "number_of_tracks")
-		private int numberOfTracks;
-		
-		@Column(name = "pmrc_rating")
-		private String pmrcRating;
-		
-		@Column(name = "cover_image_path")
-		private String coverImagePath;
-		
-		@Column(name = "length")
-		private int length;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.util.*;
+
+@Entity
+@Table (name="album")
+public class Album {
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	
-	/*public Album(String title,String releaseDate,String recordingCompany,int numberOfTracks, String pmrcRating, int length) {
-		
-		this.title = title;
-		this.releaseDate = releaseDate;
-		this.recordingCompany = recordingCompany;
-		this.numberOfTracks= numberOfTracks;
-		this.pmrcRating= pmrcRating;
-		this.length = length;
-		UUID uuidAlbum= UUID.randomUUID();
-		albumID = uuidAlbum.toString();//creates UUID
-		String sql = "INSERT INTO album (album_id, title, release_date, recording_company_name,number_of_tracks, pmrc_rating, length) VALUES  (?,?,?,?,?,?,?);";//creates a new object record
-		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, albumID);
-			stmt.setString(2, title);
-			stmt.setString(3, releaseDate);
-			stmt.setString(4, recordingCompany);
-			stmt.setInt(5, numberOfTracks);
-			stmt.setString(6, pmrcRating);
-			stmt.setInt(7, length);
-			System.out.println(stmt);
-			int i = stmt.executeUpdate();
-			System.out.println(i+" records inserted"); 
-			}
-			catch (SQLException e)
-			{
-				e.printStackTrace();
-			}
+	@Column(name="album_id")
+	private String albumID;
+	@Column(name="title")
+	private String title;
+	@Column(name="release_date")
+	private String releaseDate;
+	@Column(name="cover_image_path")
+	private String coverImagePath;
+	@Column(name="recording_company_name")
+	private String recordingCompany;
+	@Column(name="number_of_tracks")
+	private int numberOfTracks;
+	@Column(name="PMRC_rating")
+	private String pmrcRating;
+	@Column(name="length")
+	private int length;
+	@Transient
+	private Map<String, Song> albumSongs = new HashMap<String, Song>();
+	@Transient
+	private Connection con;
+	@Transient
+	private PreparedStatement stmt;
+	
+	/**
+	 * default constructor that sets a random UUID
+	 */
+	public Album() {
+		UUID uAlbumID = UUID.randomUUID();
+		albumID = uAlbumID.toString();
 	}
-	public Album(String albumID) {
-		this.albumID = albumID;	//constructor
-		String sql = "SELECT title, release_date, cover_image_path, recording_company_name from album WHERE album_id = ?";
-		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, albumID);
-			ResultSet rs = stmt.executeQuery();
-			
-			if(rs.next()) {
-			
-				this.title = rs.getString("title");
-				this.length = rs.getInt("release_date");
-				this.releaseDate = rs.getString("cover_image_path");
-				this.recordingCompany= rs.getString("recording_company_name");
-				System.out.println(this.title);
-				System.out.println(this.length);
-				System.out.println(this.releaseDate);
-				System.out.println(this.recordingCompany);
-			}
-			
-		} catch(SQLException e) {
-			e.printStackTrace();
-		}
-	*///}
-	//all setters for database updating
-	public void setAlbumID(String albumID) {
-		this.albumID = albumID;
+	
+	/**
+	 * 
+	 * @return albumID of a given Album record
+	 */
+	public String getAlbumID() {
+		return albumID;
 	}
+	/**
+	 * 
+	 * @return title of the album
+	 */
 	public String getTitle() {
 		return title;
 	}
+	/**
+	 * 
+	 * @param title
+	 */
 	public void setTitle(String title) {
-		this.title=title;
+		this.title = title;
 	}
-	public String getAlbumID() {
-		
-		return albumID;
-	}
+	/**
+	 * 
+	 * @return the date of release for a given album
+	 */
 	public String getReleaseDate() {
 		return releaseDate;
 	}
+	/**
+	 * 
+	 * @param releaseDate
+	 */
 	public void setReleaseDate(String releaseDate) {
 		this.releaseDate = releaseDate;
 	}
+	/**
+	 * 
+	 * @return the location of the album cover image file
+	 */
 	public String getCoverImagePath() {
 		return coverImagePath;
 	}
+	/**
+	 * 
+	 * @param coverImagePath
+	 */
 	public void setCoverImagePath(String coverImagePath) {
 		this.coverImagePath = coverImagePath;
 	}
+	/**
+	 * 
+	 * @return the name of the record label that the given album was released under
+	 */
 	public String getRecordingCompany() {
 		return recordingCompany;
 	}
+	/**
+	 * 
+	 * @param recordingCompany
+	 */
 	public void setRecordingCompany(String recordingCompany) {
 		this.recordingCompany = recordingCompany;
 	}
+	/**
+	 * 
+	 * @return the integer value for number of tracks on the given album
+	 */
 	public int getNumberOfTracks() {
 		return numberOfTracks;
 	}
+	/**
+	 * 
+	 * @param numberOfTracks
+	 */
 	public void setNumberOfTracks(int numberOfTracks) {
 		this.numberOfTracks = numberOfTracks;
 	}
+	/**
+	 * 
+	 * @return the Parents Music Resource Center (PMRC) rating of a given album
+	 */
 	public String getPmrcRating() {
 		return pmrcRating;
 	}
+	/**
+	 * 
+	 * @param pmrcRating
+	 */
 	public void setPmrcRating(String pmrcRating) {
 		this.pmrcRating = pmrcRating;
 	}
+	/**
+	 * 
+	 * @return length of the album in minutes
+	 */
 	public int getLength() {
 		return length;
 	}
+	/**
+	 * 
+	 * @param length
+	 */
 	public void setLength(int length) {
 		this.length = length;
 	}
-	/*public void addSong(Song song) {
-		String sql = "INSERT INTO song_album (fk_song_id,fk_album_id) VALUES  (?,?);";
+	public JSONObject toJSON(){
+		JSONObject songJson = new JSONObject();
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, song.getSongID());
-			System.out.println(albumID);
-			albumSongs.put(song.getSongID(), song); //adds the song object to the albumSongs map
-			int i = stmt.executeUpdate();
-			System.out.println(i+" records updated"); 
-			}
-		catch (SQLException e)
-			{
-				e.printStackTrace();
-			}
+			songJson.put("album_id", this.albumID);
+			songJson.put("title", this.title);
+			songJson.put("song_length", this.length);
+			songJson.put("release_date", this.releaseDate);
+			songJson.put("cover_image_path", this.coverImagePath);
+			songJson.put("number_of_tracks", this.numberOfTracks);
+			songJson.put("PMRC_rating", this.pmrcRating);
+			songJson.put("length", this.length);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return songJson;
 	}
-	public void deleteSong(String songID) {
-		String sql = "DELETE FROM song_artist WHERE fk_song_id = ?;";
-		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, songID);
-			System.out.println(stmt);
-			int i = stmt.executeUpdate();
-			System.out.println(i+" records updated"); 
-			}
-		catch (SQLException e)
-			{
-				e.printStackTrace();
-			}
-		
-	}
-	public void deleteSong2 (Song song) {
-		String sql = "DELETE FROM song_artist WHERE fk_song_id  ?;";
-		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, song.getSongID());
-			int i = stmt.executeUpdate();
-			System.out.println(i+" records updated"); 
-			}
-			catch (SQLException e)
-			{
-				e.printStackTrace();
-			}
-		
-	}
-	
-	public void deleteAlbum(Album album)
-	{
-		String sql = "DELETE FROM album WHERE album_id = ?;";
-		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, album.getAlbumID());
-			System.out.println(stmt);
-			int i = stmt.executeUpdate();
-			System.out.println(i+" records updated"); 
-			}
-		catch (SQLException e)
-			{
-				e.printStackTrace();
-			}
-	
-	
-		
-		
-	}*/
 }

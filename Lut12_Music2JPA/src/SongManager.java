@@ -1,107 +1,155 @@
+/**
+ * this class manages CRUD operations for the Song class
+ * based on Dr. Babichenko's MusicJPA example code from the GenreManager class
+ * @author Luke Tuite
+ */
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import java.util.UUID;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class SongManager {
-	public void createSong(String title, int length, String filePath, String releaseDate, String recordDate){
-		EntityManagerFactory emFactory = 
-				Persistence.createEntityManagerFactory("Lut12_Music2JPA");
-		
+	
+	/**
+	 * uses an EntityManager to create a new song record in the database
+	 * @param title
+	 * @param length
+	 * @param releaseDate
+	 * @param recordDate
+	 * @param filePath
+	 */
+	public void createSong(String songID, String title, int length, String releaseDate, String recordDate, String filePath) {
+		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("jmf194_FinalProject");
 		EntityManager em = emFactory.createEntityManager();
 		
 		em.getTransaction().begin();
 		Song s = new Song();
 		
-		// Song a = new Song();
-		s.setSongID(UUID.randomUUID().toString());
-		
-		//s.setSongID(SongID);
+		s.setSongID(songID);
 		s.setTitle(title);
 		s.setLength(length);
-		s.setFilePath(filePath);
 		s.setReleaseDate(releaseDate);
 		s.setRecordDate(recordDate);
+		s.setFilePath(filePath);
 		
-		
-		// Add the Song object to the ORM object grid
 		em.persist(s);
-		
-		// Commit transaction
 		em.getTransaction().commit();
-		
-		// Close connection to persistence manager
 		em.close();
 		emFactory.close();
 	}
+	public JSONArray getSongList(String searchTerm, String searchType) {
+		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("Lut12_Music2JPA");
+		EntityManager em = emFactory.createEntityManager();
+		
+		// Note that you are querying the object grid, not the database!
+		String qry = "SELECT s.songID FROM Song s ";
+		
+		if(!searchTerm.equals("")){
+			if(searchType.equalsIgnoreCase("equals")){
+				qry += "WHERE s.title = '" + searchTerm + "'";
+			}
+			else if(searchType.equalsIgnoreCase("begin")){
+				qry += "WHERE s.title LIKE '" + searchTerm + "%'";
+			}
+			else if(searchType.equalsIgnoreCase("ends")){
+				qry += "WHERE s.title LIKE '%" + searchTerm + "'";
+			}
+			else if(searchType.equalsIgnoreCase("all")){
+				qry += "GROUP BY title";
+			}
+			else{
+				qry += "WHERE s.title LIKE '%" + searchTerm + "%'";
+			}
+		}
+		
+		List<String> songIDs = em.createQuery(qry).getResultList();
+		JSONArray songListJSON = new JSONArray();
+		for(String songID : songIDs) {
+			Song s = em.find(Song.class, songID);
+			songListJSON.put(s.toJSON());
+		}
+		em.close();
+		emFactory.close();
+		
+		return songListJSON;
+	}
 	
 	
-	public void updateSong(String SongID, String title, int length, String filePath, String releaseDate, String recordDate){
+	/**
+	 * uses an EntityManager to find a song record with a given ID and change its attributes as needed
+	 * @param songID
+	 * @param title
+	 * @param length
+	 * @param releaseDate
+	 * @param recordDate
+	 * @param filePath
+	 */
+	public void updateSong(String songID, String title, int length, String releaseDate, String recordDate, String filePath) {
 		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("Lut12_Music2JPA");
 		EntityManager em = emFactory.createEntityManager();
 		em.getTransaction().begin();
 		
-		Song g = em.find(Song.class, SongID);
+		Song s = em.find(Song.class, songID);
 		
-		if(!title.equals("")){
-			g.setTitle(title);
-		}
-		
-		if(!(length == 0)){
-			g.setLength(length);
+		if (!title.equals("")) {
+			s.setTitle(title);
 		}
 		
-		if(!filePath.equals("")) {
-			g.setFilePath(filePath);
+		if (length != 0) {
+			s.setLength(length);
 		}
-		if(!releaseDate.equals("")) {
-			g.setReleaseDate(releaseDate);
-		}
-		if(!recordDate.equals("")) {
-			g.setRecordDate(recordDate);
-		}
-		em.persist(g);
-		em.getTransaction().commit();
 		
+		if (!releaseDate.equals("")) {
+			s.setReleaseDate(releaseDate);
+		}
+		
+		if (!recordDate.equals("")) {
+			s.setRecordDate(recordDate);
+		}
+		
+		if (!filePath.equals("")) {
+			s.setFilePath(filePath);
+		}
+		
+		em.persist(s);
+		em.getTransaction().commit();		
 		em.close();
 		emFactory.close();
+	}
+	/**
+	 * uses an EntityManager to find a song record within the database and delete it
+	 * @param songID
+	 */
+	public void deleteSong(String songID) {
+		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("Lut12_Music2JPA");
+		EntityManager em = emFactory.createEntityManager();
+		em.getTransaction().begin();
+		
+		Song s = em.find(Song.class, songID);
+		em.remove(s);
+		em.getTransaction().commit();
+		em.close();
+		emFactory.close();
+	}
+	/**
+	 * finder method not shown in GenreManager example, but simple to guess what it should be
+	 * same thing as deleteSong method but instead of deleting, returns a song
+	 * @param songID
+	 * @return Song object
+	 */
+	public Song findSong(String songID) {
+		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("Lut12_Music2JPA");
+		EntityManager em = emFactory.createEntityManager();
+		em.getTransaction().begin();
+		
+		Song s = em.find(Song.class, songID);
+		em.getTransaction().commit();
+		em.close();
+		emFactory.close();
+		return s;
 	}
 	
-	public void deleteSong(String SongID){
-		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("Lut12_Music2JPA");
-		EntityManager em = emFactory.createEntityManager();
-		em.getTransaction().begin();
-		
-		Song g = em.find(Song.class, SongID);
-		
-		em.remove(g);
-		em.getTransaction().commit();
-		
-		em.close();
-		emFactory.close();
-	}
-	public Song findSong(String songID)
-	{
-		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("Lut12_Music2JPA");
-		EntityManager em = emFactory.createEntityManager();
-		em.getTransaction().begin();
-		
-		Song g = em.find(Song.class, songID);
-		
-		System.out.println(g.getSongID());
-		System.out.println(g.getTitle());
-		System.out.println(g.getLength());
-		System.out.println(g.getFilePath());
-		System.out.println(g.getReleaseDate());
-		System.out.println(g.getReleaseDate());
-		
-		em.persist(g);
-		
-		em.getTransaction().commit();
-		
-		em.close();
-		emFactory.close();
-		
-		return g;
-	}
 }
